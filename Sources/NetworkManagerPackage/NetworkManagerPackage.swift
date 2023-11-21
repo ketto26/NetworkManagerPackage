@@ -6,8 +6,9 @@ import Foundation
 
 public class NetworkManager {
     
-    static let shared = NetworkManager()
+    public static let shared = NetworkManager()
     
+
    
    public func getData<T: Codable>(urlString: String, comletion: @escaping (Result<T,Error>) ->(Void)) {
         let url = URL(string: urlString)!
