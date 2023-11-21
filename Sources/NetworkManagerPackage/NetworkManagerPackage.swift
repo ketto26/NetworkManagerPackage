@@ -4,37 +4,44 @@
 
 import Foundation
 
-func getData<T: Codable>(urlString: String, comletion: @escaping (Result<T,Error>) ->(Void)) {
-    let url = URL(string: urlString)!
+class NetworkManager {
     
-    let session = URLSession()
+    static let shared = NetworkManager()
     
-    session.dataTask(with: URLRequest(url: url)) { data, response, error in
+    func getData<T: Codable>(urlString: String, comletion: @escaping (Result<T,Error>) ->(Void)) {
+        let url = URL(string: urlString)!
         
-        if let error {
-            print(error.localizedDescription)
-        }
+        let session = URLSession()
         
-        guard let response = response as? HTTPURLResponse else {
-            return
-        }
-        
-        guard (200...299).contains(response.statusCode) else {
-            print("wrong response")
-            return
-        }
-        
-        guard let data else { return }
-
-        do {
-            let decoder = JSONDecoder()
-            let object = try decoder.decode(T.self, from: data)
+        session.dataTask(with: URLRequest(url: url)) { data, response, error in
             
-            DispatchQueue.main.async {
-                comletion(.success(object))
+            if let error {
+                print(error.localizedDescription)
             }
-        } catch {
-            comletion(.failure(error))
-        }
-    }.resume()
+            
+            guard let response = response as? HTTPURLResponse else {
+                return
+            }
+            
+            guard (200...299).contains(response.statusCode) else {
+                print("wrong response")
+                return
+            }
+            
+            guard let data else { return }
+
+            do {
+                let decoder = JSONDecoder()
+                let object = try decoder.decode(T.self, from: data)
+                
+                DispatchQueue.main.async {
+                    comletion(.success(object))
+                }
+            } catch {
+                comletion(.failure(error))
+            }
+        }.resume()
+    }
+    
 }
+
